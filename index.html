@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Device Permission Portal</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 25px;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #101827;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 430px;
+      padding: 28px;
+      border-radius: 18px;
+      background: #1d293b;
+      text-align: center;
+    }
+
+    h2 { margin-top: 0; }
+
+    p {
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 9px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button.stop { background: #dc2626; }
+
+    video {
+      width: 100%;
+      margin-top: 18px;
+      border-radius: 12px;
+      background: black;
+    }
+
+    #status {
+      margin-top: 18px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h2>Device Permission Portal</h2>
+
+    <p>
+      This page lets you test your device's camera and microphone.
+      Choose which permission you want to grant.
+      Nothing is recorded or uploaded.
+    </p>
+
+    <button id="cameraBtn">Enable Camera</button>
+    <button id="micBtn">Enable Microphone</button>
+
+    <video id="preview" autoplay playsinline muted hidden></video>
+
+    <button id="stopBtn" class="stop">Stop Camera & Microphone</button>
+
+    <div id="status" role="status">
+      Waiting for your choice.
+    </div>
+  </main>
+
+  <script>
+    const preview = document.getElementById("preview");
+    const status = document.getElementById("status");
+
+    let cameraStream = null;
+    let micStream = null;
+
+    document.getElementById("cameraBtn").addEventListener("click", async () => {
+      try {
+        cameraStream?.getTracks().forEach(track => track.stop());
+
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false
+        });
+
+        preview.srcObject = cameraStream;
+        preview.hidden = false;
+        status.textContent = "Camera permission granted. Live preview is active.";
+      } catch (error) {
+        status.textContent = "Camera access failed: " + error.message;
+      }
+    });
+
+    document.getElementById("micBtn").addEventListener("click", async () => {
+      try {
+        micStream?.getTracks().forEach(track => track.stop());
+
+        micStream = await navigator.mediaDevices.getUserMedia({
+          video: false,
+          audio: true
+        });
+
+        status.textContent = "Microphone permission granted. No audio is being recorded.";
+      } catch (error) {
+        status.textContent = "Microphone access failed: " + error.message;
+      }
+    });
+
+    document.getElementById("stopBtn").addEventListener("click", () => {
+      [cameraStream, micStream].forEach(stream => {
+        stream?.getTracks().forEach(track => track.stop());
+      });
+
+      cameraStream = null;
+      micStream = null;
+      preview.srcObject = null;
+      preview.hidden = true;
+
+      status.textContent = "Camera and microphone stopped.";
+    });
+  </script>
+</body>
+</html>
