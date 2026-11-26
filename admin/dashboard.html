@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Device Monitoring Portal</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <!-- Firebase SDK for real-time WebRTC signaling -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <div class="dashboard-layout">
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+      <div class="nav-brand">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+          </svg>
+        </div>
+        <span class="brand-name">ESP8266 Monitoring Portal &bull; Admin Console</span>
+      </div>
+
+      <div class="nav-actions">
+        <span class="user-badge" id="adminUserBadge">Admin: admin</span>
+        <button id="refreshBtn" class="btn-admin btn-admin-secondary" title="Refresh session list">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          Refresh
+        </button>
+        <button id="logoutBtn" class="btn-admin btn-admin-danger">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- 4 Overview Metric Cards -->
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-header">
+            <span>Total Active Sessions</span>
+            <div class="metric-icon" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="metric-value" id="metricTotalSessions">0</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span>Sharing Camera</span>
+            <div class="metric-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+            </div>
+          </div>
+          <div class="metric-value" id="metricSharingCamera">0</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span>Sharing Microphone</span>
+            <div class="metric-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="metric-value" id="metricSharingMic">0</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span>Active WebRTC Links</span>
+            <div class="metric-icon" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="metric-value" id="metricActiveWebRTC">0</div>
+        </div>
+      </section>
+
+      <!-- Dashboard Grid: Table and Live Monitor -->
+      <section class="dashboard-grid">
+        <!-- Connected Devices Panel -->
+        <div class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>
+              Connected Devices
+            </h2>
+          </div>
+
+          <!-- Search and Status Filters -->
+          <div class="toolbar">
+            <input type="text" id="searchInput" class="form-input search-input" placeholder="Search by Session ID or Device ID...">
+            <select id="statusFilter" class="filter-select">
+              <option value="all">All Sharing Statuses</option>
+              <option value="camera">Sharing Camera</option>
+              <option value="mic">Sharing Microphone</option>
+              <option value="both">Sharing Both</option>
+              <option value="not-sharing">Not Sharing</option>
+            </select>
+          </div>
+
+          <!-- Connected Devices Table -->
+          <div class="table-responsive">
+            <table class="devices-table">
+              <thead>
+                <tr>
+                  <th>Session ID</th>
+                  <th>Device ID</th>
+                  <th>IP Address</th>
+                  <th>Connection Time</th>
+                  <th>Camera</th>
+                  <th>Microphone</th>
+                  <th>Connection</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="sessionsTableBody">
+                <tr>
+                  <td colspan="8" style="text-align: center; color: var(--admin-text-dim); padding: 24px;">
+                    Loading visitor sessions...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Live Monitoring Panel -->
+        <div class="panel monitor-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polygon points="10 8 16 12 10 16 10 8"></polygon>
+              </svg>
+              Live Monitoring Interface
+            </h2>
+            <div id="liveStatusBadge" class="badge badge-dim">No Stream Selected</div>
+          </div>
+
+          <!-- Video Viewport -->
+          <div class="video-container" id="videoContainer">
+            <video id="remoteVideo" class="remote-video" autoplay playsinline></video>
+            <div id="videoPlaceholder" class="video-placeholder">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+              <div>Select an active, consenting visitor session from the table to view their shared stream.</div>
+            </div>
+          </div>
+
+          <!-- Audio Controls -->
+          <div class="audio-controls">
+            <button id="muteBtn" class="btn-admin btn-admin-secondary" style="padding: 6px 10px;" title="Mute/Unmute Audio">
+              <svg id="muteIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              </svg>
+            </button>
+            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.05" value="1" title="Volume Slider">
+            <span id="volumePercent" style="font-size: 12px; color: var(--admin-text-muted); min-width: 38px;">100%</span>
+            <button id="fullscreenBtn" class="btn-admin btn-admin-secondary" style="padding: 6px 10px;" title="Fullscreen Video">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <polyline points="9 21 3 21 3 15"></polyline>
+                <line x1="21" y1="3" x2="14" y2="10"></line>
+                <line x1="3" y1="21" x2="10" y2="14"></line>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Session Metadata & Controls -->
+          <div class="monitor-details">
+            <div class="detail-row">
+              <span style="color: var(--admin-text-muted);">Active Session:</span>
+              <strong id="activeSessionIdText" style="font-family: monospace;">None</strong>
+            </div>
+            <div class="detail-row">
+              <span style="color: var(--admin-text-muted);">Device IP:</span>
+              <span id="activeIpText">—</span>
+            </div>
+            <div class="detail-row">
+              <span style="color: var(--admin-text-muted);">Media Tracks:</span>
+              <span id="activeMediaTracksText">—</span>
+            </div>
+            <div class="detail-row">
+              <span style="color: var(--admin-text-muted);">WebRTC State:</span>
+              <span id="webrtcStateText">Idle</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div style="display: flex; gap: 10px;">
+            <button id="disconnectStreamBtn" class="btn-admin btn-admin-danger" style="flex: 1;" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              </svg>
+              Disconnect Stream
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+  </div>
+
+  <script type="module" src="/js/admin-dashboard.js"></script>
+</body>
+</html>

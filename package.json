@@ -1,0 +1,28 @@
+{
+  "name": "esp8266-permission-portal",
+  "version": "1.0.0",
+  "description": "Consent-Based Remote Camera & Microphone Monitoring System with ESP8266 Captive Portal and Admin Dashboard",
+  "type": "module",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/api.test.js"
+  },
+  "keywords": [
+    "esp8266",
+    "webrtc",
+    "captive-portal",
+    "camera-stream",
+    "remote-monitoring",
+    "admin-dashboard"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie": "^0.7.2"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.7"
+  }
+}
