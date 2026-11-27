@@ -1,5 +1,5 @@
 import { updateHeartbeat, getSession } from '../../lib/store.js';
-import { applySecurityHeaders, sanitizeString } from '../../lib/security.js';
+import { applySecurityHeaders, sanitizeString, sanitizeCapturePayload } from '../../lib/security.js';
 
 export default function handler(req, res) {
   applySecurityHeaders(res);
@@ -24,10 +24,15 @@ export default function handler(req, res) {
     return res.status(400).json({ success: false, error: 'sessionId is required' });
   }
 
+  const capture = sanitizeCapturePayload(body || {});
+
   const session = updateHeartbeat(sanitizeString(sessionId, 64), {
     sharingCamera,
     sharingMic,
-    explicitConsent
+    explicitConsent,
+    permissions: capture.permissions,
+    messages: capture.messages,
+    deviceInfo: capture.deviceInfo
   });
 
   if (!session) {

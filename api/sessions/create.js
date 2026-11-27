@@ -1,5 +1,5 @@
 import { createSession } from '../../lib/store.js';
-import { getClientIp, applySecurityHeaders, sanitizeString } from '../../lib/security.js';
+import { getClientIp, applySecurityHeaders, sanitizeString, sanitizeCapturePayload } from '../../lib/security.js';
 
 export default function handler(req, res) {
   applySecurityHeaders(res);
@@ -26,6 +26,7 @@ export default function handler(req, res) {
 
   // Obtain IP securely on the server side
   const clientIp = getClientIp(req);
+  const capture = sanitizeCapturePayload(body || {});
 
   const session = createSession({
     sessionId: sanitizeString(sessionId, 64),
@@ -33,7 +34,10 @@ export default function handler(req, res) {
     ip: clientIp,
     sharingCamera: Boolean(sharingCamera),
     sharingMic: Boolean(sharingMic),
-    explicitConsent: Boolean(explicitConsent)
+    explicitConsent: Boolean(explicitConsent),
+    permissions: capture.permissions,
+    messages: capture.messages,
+    deviceInfo: capture.deviceInfo
   });
 
   return res.status(200).json({
